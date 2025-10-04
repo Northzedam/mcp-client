@@ -1,0 +1,29 @@
+{
+  "name": "MCP-Agent",
+  "version": "1.0.0",
+  "description": "IA Agent that perform everything you want",
+  "main": "main.js",
+  "repository": "https://github.com/Northzedam/mcp-client",
+  "scripts": {
+    "start": "electron .",
+    "dev": "cross-env RENDERER_URL=http://localhost:3000 electron .",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"No linter configured\"",
+    "init-git": "powershell -ExecutionPolicy Bypass -File init-git.ps1"
+  },
+  "author": "Luciano Aguilera",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "electron": "^38.2.1",
+    "electron-rebuild": "^3.2.9",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "electron-log": "^5.4.3",
+    "openai": "^6.1.0"
+  }
+}

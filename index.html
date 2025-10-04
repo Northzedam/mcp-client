@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'"
+    />
+    <title>MCP Agent Chat</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="header">
+      <h1>MCP Agent Chat</h1>
+      <div class="status">
+        <div class="status-indicator" id="statusIndicator"></div>
+        <span id="statusText">Conectando...</span>
+      </div>
+    </div>
+
+    <div class="chat-container">
+      <div class="messages" id="messagesContainer">
+        <div class="empty-state">
+          <h3>¡Hola! 👋</h3>
+          <p>Comienza una conversación escribiendo un mensaje abajo.</p>
+        </div>
+      </div>
+
+      <!-- Panel de herramientas MCP (solo visible en modo Agente) -->
+      <div id="mcpToolsPanel" class="mcp-tools-panel" style="display: none;">
+        <div class="mcp-tools-header">
+          <h4>Herramientas MCP Disponibles</h4>
+        </div>
+        <div class="mcp-tools-content">
+          <div class="tool-item">
+            <span class="tool-name">filesystem.read</span>
+            <span class="tool-status allow">ALLOW</span>
+          </div>
+          <div class="tool-item">
+            <span class="tool-name">filesystem.write</span>
+            <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+          </div>
+          <div class="tool-item">
+            <span class="tool-name">playwright.goto</span>
+            <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+          </div>
+          <div class="tool-item">
+            <span class="tool-name">web_search</span>
+            <span class="tool-status allow">ALLOW</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <div class="mode-selector">
+          <label for="modeSelect">Modo:</label>
+          <select id="modeSelect" class="mode-select">
+            <option value="ask">Preguntar</option>
+            <option value="agent">Agente</option>
+          </select>
+          <span id="modeIndicator" class="mode-indicator ask">Preguntar</span>
+        </div>
+        <div class="input-wrapper">
+          <textarea 
+            id="messageInput" 
+            class="message-input" 
+            placeholder="Escribe tu mensaje..."
+            rows="1"
+          ></textarea>
+        </div>
+        <button id="sendButton" class="send-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <script src="renderer.js"></script>
+    <script src="chat.js"></script>
+  </body>
+</html>

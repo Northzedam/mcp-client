@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  createdAt TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  sessionId TEXT NOT NULL,
+  role TEXT NOT NULL,
+  content TEXT NOT NULL,
+  createdAt TEXT NOT NULL
+);
