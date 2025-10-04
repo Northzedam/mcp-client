@@ -11,7 +11,8 @@
     "dist": "electron-builder --publish=never",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "echo \"No linter configured\"",
-    "init-git": "powershell -ExecutionPolicy Bypass -File init-git.ps1"
+    "init-git": "powershell -ExecutionPolicy Bypass -File init-git.ps1",
+    "setup-api": "powershell -ExecutionPolicy Bypass -File setup-api-key.ps1"
   },
   "author": "Luciano Aguilera",
   "license": "MIT",

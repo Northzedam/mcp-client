@@ -56,13 +56,27 @@ MCP-Agent/
    ```
 
 3. **Configurar API Key de OpenAI:**
-   ```bash
-   # Opción 1: Variable de entorno
-   export OPENAI_API_KEY="tu-api-key-aqui"
    
-   # Opción 2: Desde la aplicación (Developer Console)
-   await window.api.settings.set('openai_api_key', 'tu-api-key-aqui')
+   **Opción 1: Variable de entorno (Recomendado)**
+   ```bash
+   # Windows (PowerShell)
+   $env:OPENAI_API_KEY="tu-api-key-aqui"
+   
+   # Windows (CMD)
+   set OPENAI_API_KEY=tu-api-key-aqui
+   
+   # Linux/Mac
+   export OPENAI_API_KEY="tu-api-key-aqui"
    ```
+   
+   **Opción 2: Desde la aplicación**
+   - Abre la consola de desarrollador (F12)
+   - Ejecuta: `await window.api.settings.set('openai_api_key', 'tu-api-key-aqui')`
+   
+   **Opción 3: Archivo .env**
+   - Copia `env.example` a `.env`
+   - Edita `.env` y agrega tu API key
+   - La aplicación cargará automáticamente las variables
 
 4. **Ejecutar la aplicación:**
    ```bash

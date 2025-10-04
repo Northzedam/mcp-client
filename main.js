@@ -45,10 +45,14 @@ app.whenReady().then(() => {
     logToolDecision, listToolLogs
   }
   
-  // Inicializar OpenAI (usar API key de settings o variable de entorno)
+  // Inicializar OpenAI (usar API key de variable de entorno o settings)
   const apiKey = process.env.OPENAI_API_KEY || dbInstance.getSetting('openai_api_key')
+  
   if (apiKey) {
     openaiClient = new OpenAIClient(apiKey)
+    console.log('OpenAI client inicializado correctamente')
+  } else {
+    console.warn('⚠️  OpenAI API key no configurada. Configura OPENAI_API_KEY como variable de entorno o usa la UI para configurarla.')
   }
   
   // Inicializar MCP Adapter
@@ -117,7 +121,15 @@ function setupIpcHandlers() {
   // Handlers para settings
   ipcMain.handle('settings:set', async (event, key, value) => {
     try {
-      return dbInstance.setSetting(key, value)
+      dbInstance.setSetting(key, value)
+      
+      // Si se está configurando la API key, reinicializar el cliente OpenAI
+      if (key === 'openai_api_key' && value) {
+        openaiClient = new OpenAIClient(value)
+        console.log('OpenAI client reinicializado con nueva API key')
+      }
+      
+      return { success: true }
     } catch (error) {
       console.error('Error al guardar setting:', error)
       throw error

@@ -16,9 +16,10 @@ data.db-wal
 .env.test.local
 .env.production.local
 
-# API Keys (security)
+# API Keys and secrets
 *.key
 *.pem
+secrets.json
 
 # Logs
 logs
