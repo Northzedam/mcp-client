@@ -46,7 +46,7 @@ app.whenReady().then(() => {
   }
   
   // Inicializar OpenAI (usar API key de settings o variable de entorno)
-  const apiKey = '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' || process.env.OPENAI_API_KEY || dbInstance.getSetting('openai_api_key')
+  const apiKey = process.env.OPENAI_API_KEY || dbInstance.getSetting('openai_api_key')
   if (apiKey) {
     openaiClient = new OpenAIClient(apiKey)
   }
