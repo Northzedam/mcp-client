@@ -334,7 +334,10 @@ class ChatApp {
   }
 
   scrollToBottom() {
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    this.messagesContainer.scrollTo({
+      top: this.messagesContainer.scrollHeight,
+      behavior: 'smooth'
+    });
   }
 }
 
