@@ -9,7 +9,9 @@ body {
   background: #f5f5f5;
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
 }
 
 .header {
@@ -335,4 +337,371 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 280px;
+  background: #2c3e50;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  border-right: 1px solid #34495e;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #34495e;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #34495e;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.sidebar.collapsed .sidebar-header h3 {
+  display: none;
+}
+
+.toggle-sidebar {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.toggle-sidebar:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.new-chat-button {
+  width: 100%;
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+  margin-bottom: 1.5rem;
+}
+
+.new-chat-button:hover {
+  background: #2980b9;
+}
+
+.sidebar.collapsed .new-chat-button {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed .new-chat-button span {
+  display: none;
+}
+
+.conversations-section h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #bdc3c7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar.collapsed .conversations-section h4 {
+  display: none;
+}
+
+.conversations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.conversation-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.conversation-item.active {
+  background: #3498db;
+}
+
+.conversation-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.conversation-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conversation-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.conversation-time {
+  font-size: 0.75rem;
+  color: #bdc3c7;
+}
+
+.conversation-item.active .conversation-time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.conversation-delete {
+  background: none;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+  margin-left: 0.5rem;
+}
+
+.conversation-item:hover .conversation-delete {
+  opacity: 1;
+}
+
+.conversation-delete:hover {
+  background: rgba(231, 76, 60, 0.2);
+}
+
+.empty-conversations {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #bdc3c7;
+}
+
+.empty-conversations p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+}
+
+.empty-conversations small {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.error-message {
+  padding: 1rem;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  border-radius: 0.5rem;
+  color: #e74c3c;
+  font-size: 0.875rem;
+}
+
+/* Main content adjustments */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Tabs System */
+.tabs-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tabs-header {
+  display: flex;
+  background: #34495e;
+  border-bottom: 1px solid #2c3e50;
+  padding: 0;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  color: #bdc3c7;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-bottom: 3px solid transparent;
+  position: relative;
+}
+
+.tab-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.tab-button.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom-color: #3498db;
+}
+
+.tab-button svg {
+  opacity: 0.8;
+}
+
+.tab-button.active svg {
+  opacity: 1;
+}
+
+.tabs-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tab-content {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tab-content.active {
+  display: flex;
+}
+
+/* MCP Tools Panel - Updated for tabs */
+.mcp-tools-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+  margin: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+}
+
+.mcp-tools-header {
+  background: #2c3e50;
+  color: white;
+  padding: 1.5rem;
+  border-bottom: 1px solid #34495e;
+}
+
+.mcp-tools-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.mcp-tools-header p {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.8;
+}
+
+.mcp-tools-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  min-height: 400px;
+}
+
+.tool-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  min-height: 60px;
+}
+
+.tool-item:hover {
+  border-color: #3498db;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+}
+
+.tool-item:last-child {
+  margin-bottom: 0;
+}
+
+.tool-name {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.tool-status {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tool-status.allow {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.tool-status.require {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.tool-status.deny {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }

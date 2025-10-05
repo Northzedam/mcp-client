@@ -31,7 +31,7 @@ app.whenReady().then(() => {
   const dbPath = path.join(__dirname, 'data.db')
   const { 
     db, migrate, 
-    getSessions, createSession, listMessages, appendMessage,
+    getSessions, createSession, deleteSession, listMessages, appendMessage,
     setSetting, getSetting, listSettings,
     logToolDecision, listToolLogs
   } = createDB(dbPath)
@@ -40,7 +40,7 @@ app.whenReady().then(() => {
   // Guardar instancia de DB y funciones
   dbInstance = { 
     db, 
-    getSessions, createSession, listMessages, appendMessage,
+    getSessions, createSession, deleteSession, listMessages, appendMessage,
     setSetting, getSetting, listSettings,
     logToolDecision, listToolLogs
   }
@@ -95,6 +95,15 @@ function setupIpcHandlers() {
       return dbInstance.createSession(title)
     } catch (error) {
       console.error('Error al crear sesión:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('sessions:delete', async (event, sessionId) => {
+    try {
+      return dbInstance.deleteSession(sessionId)
+    } catch (error) {
+      console.error('Error al eliminar sesión:', error)
       throw error
     }
   })

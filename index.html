@@ -15,72 +15,134 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
-    <div class="header">
-      <h1>MCP Agent Chat</h1>
-      <div class="status">
-        <div class="status-indicator" id="statusIndicator"></div>
-        <span id="statusText">Conectando...</span>
+    <!-- Sidebar será insertado aquí por sidebar.js -->
+    
+    <div class="main-content">
+      <div class="header">
+        <h1>MCP Agent Chat</h1>
+        <div class="status">
+          <div class="status-indicator" id="statusIndicator"></div>
+          <span id="statusText">Conectando...</span>
+        </div>
+      </div>
+
+      <!-- Sistema de Pestañas -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-button active" data-tab="chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+            </svg>
+            Chat
+          </button>
+          <button class="tab-button" data-tab="mcp">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Herramientas MCP
+          </button>
+        </div>
+
+        <!-- Contenido de las pestañas -->
+        <div class="tabs-content">
+          <!-- Pestaña Chat -->
+          <div id="chatTab" class="tab-content active">
+            <div class="chat-container">
+              <div class="messages" id="messagesContainer">
+                <div class="empty-state">
+                  <h3>¡Hola! 👋</h3>
+                  <p>Comienza una conversación escribiendo un mensaje abajo.</p>
+                </div>
+              </div>
+
+              <div class="input-container">
+                <div class="mode-selector">
+                  <label for="modeSelect">Modo:</label>
+                  <select id="modeSelect" class="mode-select">
+                    <option value="ask">Preguntar</option>
+                    <option value="agent">Agente</option>
+                  </select>
+                  <span id="modeIndicator" class="mode-indicator ask">Preguntar</span>
+                </div>
+                <div class="input-wrapper">
+                  <textarea 
+                    id="messageInput" 
+                    class="message-input" 
+                    placeholder="Escribe tu mensaje..."
+                    rows="1"
+                  ></textarea>
+                </div>
+                <button id="sendButton" class="send-button">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pestaña MCP -->
+          <div id="mcpTab" class="tab-content">
+            <div class="mcp-tools-panel">
+              <div class="mcp-tools-header">
+                <h3>Herramientas MCP Disponibles</h3>
+                <p>Gestiona las herramientas disponibles para el agente</p>
+              </div>
+              <div class="mcp-tools-content">
+                <div class="tool-item">
+                  <span class="tool-name">filesystem.read</span>
+                  <span class="tool-status allow">ALLOW</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">filesystem.write</span>
+                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">filesystem.list</span>
+                  <span class="tool-status allow">ALLOW</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">playwright.goto</span>
+                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">playwright.click</span>
+                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">playwright.screenshot</span>
+                  <span class="tool-status allow">ALLOW</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">web_search</span>
+                  <span class="tool-status allow">ALLOW</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">web_scrape</span>
+                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">database.query</span>
+                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">email.send</span>
+                  <span class="tool-status deny">DENY</span>
+                </div>
+                <div class="tool-item">
+                  <span class="tool-name">system.execute</span>
+                  <span class="tool-status deny">DENY</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="chat-container">
-      <div class="messages" id="messagesContainer">
-        <div class="empty-state">
-          <h3>¡Hola! 👋</h3>
-          <p>Comienza una conversación escribiendo un mensaje abajo.</p>
-        </div>
-      </div>
-
-      <!-- Panel de herramientas MCP (solo visible en modo Agente) -->
-      <div id="mcpToolsPanel" class="mcp-tools-panel" style="display: none;">
-        <div class="mcp-tools-header">
-          <h4>Herramientas MCP Disponibles</h4>
-        </div>
-        <div class="mcp-tools-content">
-          <div class="tool-item">
-            <span class="tool-name">filesystem.read</span>
-            <span class="tool-status allow">ALLOW</span>
-          </div>
-          <div class="tool-item">
-            <span class="tool-name">filesystem.write</span>
-            <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-          </div>
-          <div class="tool-item">
-            <span class="tool-name">playwright.goto</span>
-            <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-          </div>
-          <div class="tool-item">
-            <span class="tool-name">web_search</span>
-            <span class="tool-status allow">ALLOW</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="input-container">
-        <div class="mode-selector">
-          <label for="modeSelect">Modo:</label>
-          <select id="modeSelect" class="mode-select">
-            <option value="ask">Preguntar</option>
-            <option value="agent">Agente</option>
-          </select>
-          <span id="modeIndicator" class="mode-indicator ask">Preguntar</span>
-        </div>
-        <div class="input-wrapper">
-          <textarea 
-            id="messageInput" 
-            class="message-input" 
-            placeholder="Escribe tu mensaje..."
-            rows="1"
-          ></textarea>
-        </div>
-        <button id="sendButton" class="send-button">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-        </button>
-      </div>
     </div>
     
+    <script src="sidebar.js"></script>
+    <script src="tabs.js"></script>
     <script src="renderer.js"></script>
     <script src="chat.js"></script>
   </body>
