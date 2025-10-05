@@ -54,6 +54,19 @@ function createDB(dbPath) {
     return id;
   };
 
+  const deleteSession = (sessionId) => {
+    // Eliminar mensajes de la sesión
+    db.prepare('DELETE FROM messages WHERE sessionId = ?').run(sessionId);
+    
+    // Eliminar logs de herramientas de la sesión
+    db.prepare('DELETE FROM tools_logs WHERE sessionId = ?').run(sessionId);
+    
+    // Eliminar la sesión
+    const result = db.prepare('DELETE FROM sessions WHERE id = ?').run(sessionId);
+    
+    return result.changes > 0; // Retorna true si se eliminó algo
+  };
+
   const listMessages = (sessionId) =>
     db.prepare('SELECT * FROM messages WHERE sessionId = ? ORDER BY createdAt')
       .all(sessionId);
@@ -121,7 +134,7 @@ function createDB(dbPath) {
   return {
     db, migrate,
     // sesiones / mensajes
-    getSessions, createSession, listMessages, appendMessage,
+    getSessions, createSession, deleteSession, listMessages, appendMessage,
     // settings
     setSetting, getSetting, listSettings,
     // tool logs

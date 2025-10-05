@@ -3,6 +3,7 @@ class ChatApp {
     console.log('ChatApp: Constructor iniciado');
     this.currentSessionId = null;
     this.isStreaming = false;
+    this.sidebar = null;
     this.initializeElements();
     this.setupEventListeners();
     this.initializeApp();
@@ -57,6 +58,10 @@ class ChatApp {
       console.log('ChatApp: Conexión exitosa');
       this.updateStatus('connected', 'Conectado');
       
+      console.log('ChatApp: Inicializando sidebar...');
+      this.initializeSidebar();
+      console.log('ChatApp: Sidebar inicializado');
+      
       console.log('ChatApp: Inicializando sesión...');
       await this.initializeSession();
       console.log('ChatApp: Sesión inicializada:', this.currentSessionId);
@@ -68,6 +73,79 @@ class ChatApp {
       console.error('ChatApp: Error inicializando app:', error);
       this.updateStatus('error', 'Error de conexión');
       this.showError('Error al conectar con el servidor: ' + error.message);
+    }
+  }
+
+  initializeSidebar() {
+    console.log('ChatApp: Inicializando sidebar...');
+    
+    if (typeof Sidebar === 'undefined') {
+      console.error('ChatApp: Clase Sidebar no encontrada');
+      return;
+    }
+    
+    this.sidebar = new Sidebar();
+    
+    // Configurar callbacks del sidebar
+    this.sidebar.setCallbacks({
+      onNewChat: () => {
+        console.log('ChatApp: Nuevo chat solicitado desde sidebar');
+        this.createNewSession();
+      },
+      onSessionSelect: (sessionId) => {
+        console.log('ChatApp: Sesión seleccionada desde sidebar:', sessionId);
+        this.switchToSession(sessionId);
+      }
+    });
+    
+    console.log('ChatApp: Sidebar configurado correctamente');
+  }
+
+  async createNewSession() {
+    try {
+      console.log('ChatApp: Creando nueva sesión...');
+      
+      // Crear nueva sesión
+      const sessionId = await window.api.sessions.create('Nueva conversación');
+      console.log('ChatApp: Nueva sesión creada:', sessionId);
+      
+      // Cambiar a la nueva sesión
+      await this.switchToSession(sessionId);
+      
+      // Actualizar sidebar
+      if (this.sidebar) {
+        this.sidebar.refresh();
+        this.sidebar.setCurrentSession(sessionId);
+      }
+      
+    } catch (error) {
+      console.error('ChatApp: Error creando nueva sesión:', error);
+      alert('Error al crear nueva conversación');
+    }
+  }
+
+  async switchToSession(sessionId) {
+    try {
+      console.log('ChatApp: Cambiando a sesión:', sessionId);
+      
+      this.currentSessionId = sessionId;
+      
+      // Limpiar mensajes actuales
+      this.messagesContainer.innerHTML = '';
+      
+      // Cargar mensajes de la nueva sesión
+      await this.loadMessages();
+      
+      // Actualizar sidebar
+      if (this.sidebar) {
+        this.sidebar.setCurrentSession(sessionId);
+      }
+      
+      console.log('ChatApp: Cambio de sesión completado');
+      
+    } catch (error) {
+      console.error('ChatApp: Error cambiando sesión:', error);
+      alert('Error al cambiar de conversación');
     }
   }
 
@@ -236,6 +314,11 @@ class ChatApp {
       this.isStreaming = false;
       this.updateSendButton();
       this.messageInput.focus();
+      
+      // Actualizar sidebar después de enviar mensaje
+      if (this.sidebar) {
+        this.sidebar.refresh();
+      }
     }
   }
 

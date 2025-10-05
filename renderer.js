@@ -4,6 +4,7 @@ let currentMode = 'ask';
 class UIManager {
   constructor() {
     this.modeSelect = null;
+    this.tabsManager = null;
     this.initializeElements();
     this.setupEventListeners();
     this.initializeMode();
@@ -11,6 +12,13 @@ class UIManager {
 
   initializeElements() {
     this.modeSelect = document.getElementById('modeSelect');
+    
+    // Inicializar TabsManager si está disponible
+    if (typeof TabsManager !== 'undefined') {
+      this.tabsManager = new TabsManager();
+      console.log('UIManager: TabsManager inicializado');
+    }
+    
     console.log('UIManager: Elementos inicializados');
   }
 
@@ -77,30 +85,28 @@ class UIManager {
 
   handleModeSpecificLogic(mode) {
     if (mode === 'ask') {
-      // En modo "Preguntar", ocultar/deshabilitar herramientas MCP
-      this.hideMCPTools();
+      // En modo "Preguntar", ocultar pestaña MCP
+      this.hideMCPTab();
     } else if (mode === 'agent') {
-      // En modo "Agente", mostrar/habilitar herramientas MCP
-      this.showMCPTools();
+      // En modo "Agente", mostrar pestaña MCP
+      this.showMCPTab();
     }
   }
 
-  hideMCPTools() {
-    // Ocultar cualquier panel de herramientas MCP
-    const mcpPanel = document.getElementById('mcpToolsPanel');
-    if (mcpPanel) {
-      mcpPanel.style.display = 'none';
+  hideMCPTab() {
+    // Ocultar pestaña MCP usando TabsManager
+    if (this.tabsManager) {
+      this.tabsManager.updateMCPTabVisibility('ask');
     }
-    console.log('UIManager: Herramientas MCP ocultadas');
+    console.log('UIManager: Pestaña MCP ocultada');
   }
 
-  showMCPTools() {
-    // Mostrar panel de herramientas MCP
-    const mcpPanel = document.getElementById('mcpToolsPanel');
-    if (mcpPanel) {
-      mcpPanel.style.display = 'block';
+  showMCPTab() {
+    // Mostrar pestaña MCP usando TabsManager
+    if (this.tabsManager) {
+      this.tabsManager.updateMCPTabVisibility('agent');
     }
-    console.log('UIManager: Herramientas MCP mostradas');
+    console.log('UIManager: Pestaña MCP mostrada');
   }
 
   // Método para obtener el modo actual (para uso en chat.js)

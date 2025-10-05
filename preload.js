@@ -4,7 +4,8 @@ const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('api', {
   sessions: {
     list: () => ipcRenderer.invoke('sessions:list'),
-    create: (title) => ipcRenderer.invoke('sessions:create', title)
+    create: (title) => ipcRenderer.invoke('sessions:create', title),
+    delete: (sessionId) => ipcRenderer.invoke('sessions:delete', sessionId)
   },
   messages: {
     list: (sessionId) => ipcRenderer.invoke('messages:list', sessionId),
