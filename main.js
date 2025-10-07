@@ -26,6 +26,31 @@ let dbInstance = null
 let openaiClient = null
 let mcpAdapter = null
 
+// Función para obtener datos de herramientas MCP
+async function getMCPToolsData() {
+  try {
+    const servers = dbInstance.getMCPServers()
+    console.log('Main: Total servidores MCP en BD:', servers.length)
+    
+    const connectedServers = servers.filter(server => server.status === 'connected')
+    console.log('Main: Servidores MCP conectados:', connectedServers.length)
+    
+    let allTools = []
+    for (const server of connectedServers) {
+      console.log(`Main: Obteniendo herramientas del servidor ${server.name} (${server.id})`)
+      const tools = dbInstance.getMCPTools(server.id)
+      console.log(`Main: Herramientas encontradas en ${server.name}:`, tools.length)
+      allTools = allTools.concat(tools)
+    }
+    
+    console.log('Main: Total herramientas MCP reales:', allTools.length)
+    return allTools
+  } catch (error) {
+    console.log('Main: Error obteniendo herramientas MCP:', error.message)
+    return []
+  }
+}
+
 app.whenReady().then(() => {
   // Inicializar base de datos
   const dbPath = path.join(__dirname, 'data.db')
@@ -33,7 +58,11 @@ app.whenReady().then(() => {
     db, migrate, 
     getSessions, createSession, deleteSession, listMessages, appendMessage,
     setSetting, getSetting, listSettings,
-    logToolDecision, listToolLogs
+    logToolDecision, listToolLogs,
+    getMCPServers, getMCPServer, createMCPServer, updateMCPServer, deleteMCPServer,
+    getMCPTools, createMCPTool, deleteMCPTools,
+    logMCPToolExecution, listMCPToolLogs,
+    convertMCPFormatToInternal, createMCPServersFromMCPFormat
   } = createDB(dbPath)
   migrate()
   
@@ -42,7 +71,11 @@ app.whenReady().then(() => {
     db, 
     getSessions, createSession, deleteSession, listMessages, appendMessage,
     setSetting, getSetting, listSettings,
-    logToolDecision, listToolLogs
+    logToolDecision, listToolLogs,
+    getMCPServers, getMCPServer, createMCPServer, updateMCPServer, deleteMCPServer,
+    getMCPTools, createMCPTool, deleteMCPTools,
+    logMCPToolExecution, listMCPToolLogs,
+    convertMCPFormatToInternal, createMCPServersFromMCPFormat
   }
   
   // Inicializar OpenAI (usar API key de variable de entorno o settings)
@@ -189,11 +222,19 @@ function setupIpcHandlers() {
         throw new Error('OpenAI client no inicializado. Configura OPENAI_API_KEY')
       }
 
+      // Obtener herramientas MCP disponibles
+      const mcpToolsData = await getMCPToolsData()
+      const mcpTools = mcpAdapter.listTools(mcpToolsData)
+      console.log('Main: Herramientas MCP disponibles:', mcpTools.length)
+
       const fullResponse = await openaiClient.streamChat({
         sessionId,
         messages,
         model,
-        opts
+        opts,
+        tools: mcpTools,
+        mcpAdapter: mcpAdapter,
+        mcpToolsData: mcpToolsData
       })
 
       // Persistir mensaje del asistente
@@ -225,6 +266,118 @@ function setupIpcHandlers() {
       return await mcpAdapter.callTool(name, args, sessionId)
     } catch (error) {
       console.error('Error al llamar tool MCP:', error)
+      throw error
+    }
+  })
+
+  // Handlers para MCP servers
+  ipcMain.handle('mcp:getServers', async () => {
+    try {
+      return dbInstance.getMCPServers()
+    } catch (error) {
+      console.error('Error al obtener servidores MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:getServer', async (event, id) => {
+    try {
+      return dbInstance.getMCPServer(id)
+    } catch (error) {
+      console.error('Error al obtener servidor MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:createServer', async (event, serverData) => {
+    try {
+      return dbInstance.createMCPServer(serverData)
+    } catch (error) {
+      console.error('Error al crear servidor MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:updateServer', async (event, id, updates) => {
+    try {
+      return dbInstance.updateMCPServer(id, updates)
+    } catch (error) {
+      console.error('Error al actualizar servidor MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:deleteServer', async (event, id) => {
+    try {
+      return dbInstance.deleteMCPServer(id)
+    } catch (error) {
+      console.error('Error al eliminar servidor MCP:', error)
+      throw error
+    }
+  })
+
+  // Handlers para MCP tools
+  ipcMain.handle('mcp:getTools', async (event, serverId) => {
+    try {
+      return dbInstance.getMCPTools(serverId)
+    } catch (error) {
+      console.error('Error al obtener tools MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:createTool', async (event, toolData) => {
+    try {
+      return dbInstance.createMCPTool(toolData)
+    } catch (error) {
+      console.error('Error al crear tool MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:deleteTools', async (event, serverId) => {
+    try {
+      return dbInstance.deleteMCPTools(serverId)
+    } catch (error) {
+      console.error('Error al eliminar tools MCP:', error)
+      throw error
+    }
+  })
+
+  // Handlers para MCP tool logs
+  ipcMain.handle('mcp:logExecution', async (event, logData) => {
+    try {
+      return dbInstance.logMCPToolExecution(logData)
+    } catch (error) {
+      console.error('Error al registrar ejecución de tool MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:listLogs', async (event, options) => {
+    try {
+      return dbInstance.listMCPToolLogs(options)
+    } catch (error) {
+      console.error('Error al listar logs de tools MCP:', error)
+      throw error
+    }
+  })
+
+  // Handlers para conversión de formato MCP
+  ipcMain.handle('mcp:convertFormat', async (event, mcpConfig) => {
+    try {
+      return dbInstance.convertMCPFormatToInternal(mcpConfig)
+    } catch (error) {
+      console.error('Error al convertir formato MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:createFromFormat', async (event, mcpConfig) => {
+    try {
+      return dbInstance.createMCPServersFromMCPFormat(mcpConfig)
+    } catch (error) {
+      console.error('Error al crear servidores desde formato MCP:', error)
       throw error
     }
   })

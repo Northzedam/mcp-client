@@ -9,8 +9,8 @@ class MCPAdapter {
 
   setupMockTools() {
     // Mock tools disponibles
-    this.tools.set('filesystem.read', {
-      name: 'filesystem.read',
+    this.tools.set('filesystem_read', {
+      name: 'filesystem_read',
       description: 'Leer contenido de archivo',
       parameters: {
         type: 'object',
@@ -21,8 +21,8 @@ class MCPAdapter {
       }
     })
 
-    this.tools.set('filesystem.write', {
-      name: 'filesystem.write',
+    this.tools.set('filesystem_write', {
+      name: 'filesystem_write',
       description: 'Escribir contenido a archivo',
       parameters: {
         type: 'object',
@@ -34,8 +34,8 @@ class MCPAdapter {
       }
     })
 
-    this.tools.set('playwright.goto', {
-      name: 'playwright.goto',
+    this.tools.set('playwright_goto', {
+      name: 'playwright_goto',
       description: 'Navegar a URL',
       parameters: {
         type: 'object',
@@ -59,14 +59,50 @@ class MCPAdapter {
     })
   }
 
-  listTools() {
-    return Array.from(this.tools.values())
+  listTools(mcpToolsData = []) {
+    // Obtener herramientas mock
+    const mockTools = Array.from(this.tools.values()).map(tool => ({
+      type: 'function',
+      function: {
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.parameters
+      }
+    }))
+
+    console.log('MCPAdapter: Herramientas mock disponibles:', mockTools.length)
+    console.log('MCPAdapter: Datos MCP recibidos:', mcpToolsData.length)
+
+    // Obtener herramientas MCP reales desde los datos pasados
+    const mcpTools = mcpToolsData.map(tool => ({
+      type: 'function',
+      function: {
+        name: this.sanitizeToolName(tool.name),
+        description: tool.description,
+        parameters: JSON.parse(tool.input_schema || '{}')
+      }
+    }))
+
+    console.log('MCPAdapter: Herramientas MCP reales formateadas:', mcpTools.length)
+    console.log('MCPAdapter: Total herramientas disponibles:', mockTools.length + mcpTools.length)
+
+    return [...mockTools, ...mcpTools]
   }
 
-  async callTool(name, args, sessionId) {
+  sanitizeToolName(name) {
+    // Convertir nombres de herramientas para cumplir con el patrón de OpenAI
+    // Reemplazar puntos y otros caracteres no válidos con guiones bajos
+    return name.replace(/[^a-zA-Z0-9_-]/g, '_')
+  }
+
+  async callTool(name, args, sessionId, mcpToolsData = []) {
     const tool = this.tools.get(name)
     if (!tool) {
-      throw new Error(`Tool '${name}' no encontrada`)
+      // Verificar si es una herramienta MCP real
+      const mcpTool = mcpToolsData.find(t => this.sanitizeToolName(t.name) === name)
+      if (!mcpTool) {
+        throw new Error(`Tool '${name}' no encontrada`)
+      }
     }
 
     // Evaluar política
@@ -85,7 +121,7 @@ class MCPAdapter {
     // Aplicar decisión
     switch (decision) {
       case 'ALLOW':
-        return await this.executeTool(name, args)
+        return await this.executeTool(name, args, mcpToolsData)
       
       case 'REQUIRE_CONFIRMATION':
         // Por ahora, automáticamente DENY hasta que implementemos UI
@@ -111,24 +147,38 @@ class MCPAdapter {
     }
   }
 
-  async executeTool(name, args) {
-    // Mock implementations
+  async executeTool(name, args, mcpToolsData = []) {
+    // Primero verificar si es una herramienta MCP real
+    const mcpTool = mcpToolsData.find(t => this.sanitizeToolName(t.name) === name)
+    
+    if (mcpTool) {
+      console.log(`MCPAdapter: Ejecutando herramienta MCP real: ${mcpTool.name}`)
+      // Por ahora, simular ejecución de herramienta MCP real
+      return {
+        success: true,
+        result: `Ejecutando herramienta MCP: ${mcpTool.name}`,
+        tool: mcpTool.name,
+        args: args
+      }
+    }
+
+    // Si no es una herramienta MCP real, usar implementaciones mock
     switch (name) {
-      case 'filesystem.read':
+      case 'filesystem_read':
         return {
           success: true,
           result: `Mock: Leyendo archivo ${args.file}`,
           content: `Contenido mock del archivo ${args.file}`
         }
       
-      case 'filesystem.write':
+      case 'filesystem_write':
         return {
           success: true,
           result: `Mock: Escribiendo a archivo ${args.file}`,
           bytesWritten: args.content?.length || 0
         }
       
-      case 'playwright.goto':
+      case 'playwright_goto':
         return {
           success: true,
           result: `Mock: Navegando a ${args.url}`,

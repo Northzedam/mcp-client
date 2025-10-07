@@ -37,9 +37,11 @@ class TabsManager {
       button.classList.remove('active');
     });
     
-    // Remover clase active de todos los contenidos
+    // Remover clase active de todos los contenidos FORZADAMENTE
     this.tabContents.forEach(content => {
       content.classList.remove('active');
+      // Forzar ocultamiento
+      content.style.display = 'none';
     });
     
     // Agregar clase active al botón seleccionado
@@ -48,10 +50,12 @@ class TabsManager {
       activeButton.classList.add('active');
     }
     
-    // Agregar clase active al contenido seleccionado
+    // Agregar clase active al contenido seleccionado y mostrarlo FORZADAMENTE
     const activeContent = document.getElementById(`${tabName}Tab`);
     if (activeContent) {
       activeContent.classList.add('active');
+      // Forzar visualización
+      activeContent.style.display = 'flex';
     }
     
     this.activeTab = tabName;
@@ -60,6 +64,7 @@ class TabsManager {
     this.dispatchTabChangeEvent(tabName);
     
     console.log('TabsManager: Pestaña cambiada a:', tabName);
+    console.log('TabsManager: Contenido activo:', activeContent ? activeContent.id : 'ninguno');
   }
 
   dispatchTabChangeEvent(tabName) {
@@ -67,6 +72,23 @@ class TabsManager {
       detail: { tabName }
     });
     document.dispatchEvent(event);
+    
+    // Inicializar MCP UI si se cambia a la pestaña MCP
+    if (tabName === 'mcp' && !window.mcpUIInstance) {
+      this.initializeMCPUI();
+    }
+  }
+
+  initializeMCPUI() {
+    try {
+      const mcpContainer = document.getElementById('mcpContainer');
+      if (mcpContainer && window.MCPUI) {
+        window.mcpUIInstance = new MCPUI('mcpContainer');
+        console.log('MCP UI inicializada correctamente');
+      }
+    } catch (error) {
+      console.error('Error al inicializar MCP UI:', error);
+    }
   }
 
   getActiveTab() {

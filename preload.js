@@ -53,8 +53,29 @@ contextBridge.exposeInMainWorld('api', {
     }
   },
   mcp: {
+    // Funciones legacy (mock)
     listTools: () => ipcRenderer.invoke('mcp:listTools'),
-    callTool: (name, args, sessionId) => ipcRenderer.invoke('mcp:callTool', { name, args, sessionId })
+    callTool: (name, args, sessionId) => ipcRenderer.invoke('mcp:callTool', { name, args, sessionId }),
+    
+    // Funciones de servidores MCP
+    getServers: () => ipcRenderer.invoke('mcp:getServers'),
+    getServer: (id) => ipcRenderer.invoke('mcp:getServer', id),
+    createServer: (serverData) => ipcRenderer.invoke('mcp:createServer', serverData),
+    updateServer: (id, updates) => ipcRenderer.invoke('mcp:updateServer', id, updates),
+    deleteServer: (id) => ipcRenderer.invoke('mcp:deleteServer', id),
+    
+    // Funciones de tools MCP
+    getTools: (serverId) => ipcRenderer.invoke('mcp:getTools', serverId),
+    createTool: (toolData) => ipcRenderer.invoke('mcp:createTool', toolData),
+    deleteTools: (serverId) => ipcRenderer.invoke('mcp:deleteTools', serverId),
+    
+    // Funciones de logs MCP
+    logExecution: (logData) => ipcRenderer.invoke('mcp:logExecution', logData),
+    listLogs: (options) => ipcRenderer.invoke('mcp:listLogs', options),
+    
+    // Funciones de conversión de formato
+    convertFormat: (mcpConfig) => ipcRenderer.invoke('mcp:convertFormat', mcpConfig),
+    createFromFormat: (mcpConfig) => ipcRenderer.invoke('mcp:createFromFormat', mcpConfig)
   },
   policy: {
     addRule: (tool, decision) => ipcRenderer.invoke('policy:addRule', { tool, decision }),

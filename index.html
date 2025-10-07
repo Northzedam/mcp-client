@@ -83,67 +83,20 @@
 
           <!-- Pestaña MCP -->
           <div id="mcpTab" class="tab-content">
-            <div class="mcp-tools-panel">
-              <div class="mcp-tools-header">
-                <h3>Herramientas MCP Disponibles</h3>
-                <p>Gestiona las herramientas disponibles para el agente</p>
-              </div>
-              <div class="mcp-tools-content">
-                <div class="tool-item">
-                  <span class="tool-name">filesystem.read</span>
-                  <span class="tool-status allow">ALLOW</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">filesystem.write</span>
-                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">filesystem.list</span>
-                  <span class="tool-status allow">ALLOW</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">playwright.goto</span>
-                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">playwright.click</span>
-                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">playwright.screenshot</span>
-                  <span class="tool-status allow">ALLOW</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">web_search</span>
-                  <span class="tool-status allow">ALLOW</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">web_scrape</span>
-                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">database.query</span>
-                  <span class="tool-status require">REQUIRE_CONFIRMATION</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">email.send</span>
-                  <span class="tool-status deny">DENY</span>
-                </div>
-                <div class="tool-item">
-                  <span class="tool-name">system.execute</span>
-                  <span class="tool-status deny">DENY</span>
-                </div>
-              </div>
-            </div>
+            <div id="mcpContainer"></div>
           </div>
         </div>
       </div>
-    </div>
     </div>
     
     <script src="sidebar.js"></script>
     <script src="tabs.js"></script>
     <script src="renderer.js"></script>
     <script src="chat.js"></script>
+    <script src="mcp-validator.js"></script>
+    <script src="mcp-examples.js"></script>
+    <script src="mcp-manager.js"></script>
+    <script src="mcp-modal.js"></script>
+    <script src="mcp-ui.js"></script>
   </body>
 </html>
