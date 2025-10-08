@@ -75,7 +75,12 @@ contextBridge.exposeInMainWorld('api', {
     
     // Funciones de conversión de formato
     convertFormat: (mcpConfig) => ipcRenderer.invoke('mcp:convertFormat', mcpConfig),
-    createFromFormat: (mcpConfig) => ipcRenderer.invoke('mcp:createFromFormat', mcpConfig)
+    createFromFormat: (mcpConfig) => ipcRenderer.invoke('mcp:createFromFormat', mcpConfig),
+    
+    // Funciones de conexión MCP real
+    connectServer: (serverId) => ipcRenderer.invoke('mcp:connectServer', serverId),
+    disconnectServer: (serverId) => ipcRenderer.invoke('mcp:disconnectServer', serverId),
+    getConnectionStatus: (serverId) => ipcRenderer.invoke('mcp:getConnectionStatus', serverId)
   },
   policy: {
     addRule: (tool, decision) => ipcRenderer.invoke('policy:addRule', { tool, decision }),

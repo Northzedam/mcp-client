@@ -79,15 +79,38 @@ class OpenAIClient {
       
       const toolResults = [];
       
-      for (const toolCall of toolCalls) {
+      // toolCalls es un array de arrays, necesitamos aplanarlo
+      const flattenedToolCalls = toolCalls.flat();
+      console.log('OpenAI: ToolCalls aplanados:', flattenedToolCalls.length);
+      
+      for (const toolCall of flattenedToolCalls) {
+        console.log('OpenAI: Procesando toolCall:', JSON.stringify(toolCall, null, 2));
+        
         const { id, function: functionCall } = toolCall;
+        
+        if (!functionCall) {
+          console.log('OpenAI: Saltando toolCall sin function:', toolCall);
+          continue;
+        }
+        
         const { name, arguments: args } = functionCall;
         
         console.log('OpenAI: Ejecutando herramienta:', name, 'con args:', args);
         
         try {
+          // Parsear argumentos de forma segura
+          let parsedArgs = {};
+          if (args && args.trim()) {
+            try {
+              parsedArgs = JSON.parse(args);
+            } catch (parseError) {
+              console.log('OpenAI: Error parseando args, usando objeto vacío:', parseError.message);
+              parsedArgs = {};
+            }
+          }
+          
           // Ejecutar la herramienta MCP
-          const result = await mcpAdapter.callTool(name, JSON.parse(args), sessionId, mcpToolsData);
+          const result = await mcpAdapter.callTool(name, parsedArgs, sessionId, mcpToolsData);
           
           toolResults.push({
             tool_call_id: id,

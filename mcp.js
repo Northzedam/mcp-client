@@ -60,20 +60,9 @@ class MCPAdapter {
   }
 
   listTools(mcpToolsData = []) {
-    // Obtener herramientas mock
-    const mockTools = Array.from(this.tools.values()).map(tool => ({
-      type: 'function',
-      function: {
-        name: tool.name,
-        description: tool.description,
-        parameters: tool.parameters
-      }
-    }))
-
-    console.log('MCPAdapter: Herramientas mock disponibles:', mockTools.length)
     console.log('MCPAdapter: Datos MCP recibidos:', mcpToolsData.length)
 
-    // Obtener herramientas MCP reales desde los datos pasados
+    // Solo usar herramientas MCP reales (no más mock)
     const mcpTools = mcpToolsData.map(tool => ({
       type: 'function',
       function: {
@@ -84,9 +73,9 @@ class MCPAdapter {
     }))
 
     console.log('MCPAdapter: Herramientas MCP reales formateadas:', mcpTools.length)
-    console.log('MCPAdapter: Total herramientas disponibles:', mockTools.length + mcpTools.length)
+    console.log('MCPAdapter: Total herramientas disponibles:', mcpTools.length)
 
-    return [...mockTools, ...mcpTools]
+    return mcpTools
   }
 
   sanitizeToolName(name) {
@@ -96,10 +85,17 @@ class MCPAdapter {
   }
 
   async callTool(name, args, sessionId, mcpToolsData = []) {
+    console.log(`MCPAdapter: callTool llamado con name="${name}", args=`, args, 'sessionId=', sessionId)
+    console.log(`MCPAdapter: mcpToolsData disponibles:`, mcpToolsData.length)
+    
     const tool = this.tools.get(name)
     if (!tool) {
       // Verificar si es una herramienta MCP real
       const mcpTool = mcpToolsData.find(t => this.sanitizeToolName(t.name) === name)
+      console.log(`MCPAdapter: Buscando herramienta MCP "${name}", encontrada:`, !!mcpTool)
+      if (mcpTool) {
+        console.log(`MCPAdapter: Herramienta MCP encontrada:`, mcpTool.name, 'serverId:', mcpTool.serverId)
+      }
       if (!mcpTool) {
         throw new Error(`Tool '${name}' no encontrada`)
       }
@@ -107,6 +103,7 @@ class MCPAdapter {
 
     // Evaluar política
     const decision = this.policy.evaluate(name, args)
+    console.log(`MCPAdapter: Decisión de política para "${name}":`, decision)
     
     // Log de la decisión
     if (global.dbInstance) {
@@ -148,17 +145,40 @@ class MCPAdapter {
   }
 
   async executeTool(name, args, mcpToolsData = []) {
+    console.log(`MCPAdapter: executeTool llamado con name="${name}", args=`, args)
+    console.log(`MCPAdapter: mcpToolsData en executeTool:`, mcpToolsData.length)
+    
     // Primero verificar si es una herramienta MCP real
     const mcpTool = mcpToolsData.find(t => this.sanitizeToolName(t.name) === name)
+    console.log(`MCPAdapter: Herramienta MCP encontrada en executeTool:`, !!mcpTool)
     
     if (mcpTool) {
-      console.log(`MCPAdapter: Ejecutando herramienta MCP real: ${mcpTool.name}`)
-      // Por ahora, simular ejecución de herramienta MCP real
-      return {
-        success: true,
-        result: `Ejecutando herramienta MCP: ${mcpTool.name}`,
-        tool: mcpTool.name,
-        args: args
+      console.log(`MCPAdapter: Ejecutando herramienta MCP real: ${mcpTool.name} en servidor ${mcpTool.serverId}`)
+      
+      try {
+        // Obtener el MCPManager desde el proceso principal
+        const { mcpManager } = require('./main')
+        
+        if (!mcpManager) {
+          throw new Error('MCPManager no disponible')
+        }
+
+        // Ejecutar la herramienta usando el MCPManager real
+        const result = await mcpManager.executeTool(mcpTool.serverId, mcpTool.name, args, 'chat-session')
+        
+        return {
+          success: true,
+          result: result,
+          tool: mcpTool.name,
+          serverId: mcpTool.serverId
+        }
+      } catch (error) {
+        console.error(`MCPAdapter: Error ejecutando herramienta MCP: ${error.message}`)
+        return {
+          success: false,
+          error: error.message,
+          tool: mcpTool.name
+        }
       }
     }
 

@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const { createDB } = require('./db')
 const { OpenAIClient } = require('./openai')
 const { MCPAdapter } = require('./mcp')
+const { MCPManager } = require('./mcp-manager')
 const path = require('path')
 
 const createWindow = () => {
@@ -25,25 +26,36 @@ const createWindow = () => {
 let dbInstance = null
 let openaiClient = null
 let mcpAdapter = null
+let mcpManager = null
 
 // Función para obtener datos de herramientas MCP
 async function getMCPToolsData() {
   try {
-    const servers = dbInstance.getMCPServers()
-    console.log('Main: Total servidores MCP en BD:', servers.length)
+    if (!mcpManager) {
+      console.log('Main: MCPManager no inicializado')
+      return []
+    }
+
+    // Obtener herramientas del MCPManager
+    const allTools = mcpManager.getAllTools()
+    console.log('Main: Total herramientas MCP disponibles:', allTools.length)
     
-    const connectedServers = servers.filter(server => server.status === 'connected')
-    console.log('Main: Servidores MCP conectados:', connectedServers.length)
-    
-    let allTools = []
-    for (const server of connectedServers) {
-      console.log(`Main: Obteniendo herramientas del servidor ${server.name} (${server.id})`)
-      const tools = dbInstance.getMCPTools(server.id)
-      console.log(`Main: Herramientas encontradas en ${server.name}:`, tools.length)
-      allTools = allTools.concat(tools)
+    // Si no hay herramientas, intentar cargar desde la BD
+    if (allTools.length === 0) {
+      console.log('Main: No hay herramientas en MCPManager, cargando desde BD...')
+      const servers = dbInstance.getMCPServers()
+      const connectedServers = servers.filter(server => server.status === 'connected')
+      
+      let toolsFromDB = []
+      for (const server of connectedServers) {
+        const tools = dbInstance.getMCPTools(server.id)
+        toolsFromDB = toolsFromDB.concat(tools)
+      }
+      
+      console.log('Main: Herramientas desde BD:', toolsFromDB.length)
+      return toolsFromDB
     }
     
-    console.log('Main: Total herramientas MCP reales:', allTools.length)
     return allTools
   } catch (error) {
     console.log('Main: Error obteniendo herramientas MCP:', error.message)
@@ -91,8 +103,22 @@ app.whenReady().then(() => {
   // Inicializar MCP Adapter
   mcpAdapter = new MCPAdapter()
   
+  // Inicializar MCP Manager
+  mcpManager = new MCPManager(dbInstance)
+  
+  // Cargar servidores MCP y conectar los habilitados
+  mcpManager.loadServers().then(async () => {
+    console.log('MCPManager: Conectando servidores habilitados...')
+    await mcpManager.connectEnabledServers()
+  }).catch(error => {
+    console.error('Error cargando servidores MCP:', error)
+  })
+  
   // Hacer dbInstance global para MCP
   global.dbInstance = dbInstance
+  
+  // Exportar mcpManager para uso en otros módulos
+  module.exports = { mcpManager }
   
   // Configurar handlers IPC
   setupIpcHandlers()
@@ -378,6 +404,43 @@ function setupIpcHandlers() {
       return dbInstance.createMCPServersFromMCPFormat(mcpConfig)
     } catch (error) {
       console.error('Error al crear servidores desde formato MCP:', error)
+      throw error
+    }
+  })
+
+  // Handlers para conexión MCP real
+  ipcMain.handle('mcp:connectServer', async (event, serverId) => {
+    try {
+      if (!mcpManager) {
+        throw new Error('MCPManager no inicializado')
+      }
+      return await mcpManager.connectServer(serverId)
+    } catch (error) {
+      console.error('Error al conectar servidor MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:disconnectServer', async (event, serverId) => {
+    try {
+      if (!mcpManager) {
+        throw new Error('MCPManager no inicializado')
+      }
+      return await mcpManager.disconnectServer(serverId)
+    } catch (error) {
+      console.error('Error al desconectar servidor MCP:', error)
+      throw error
+    }
+  })
+
+  ipcMain.handle('mcp:getConnectionStatus', async (event, serverId) => {
+    try {
+      if (!mcpManager) {
+        throw new Error('MCPManager no inicializado')
+      }
+      return mcpManager.getConnectionStatus(serverId)
+    } catch (error) {
+      console.error('Error al obtener estado de conexión MCP:', error)
       throw error
     }
   })
