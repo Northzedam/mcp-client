@@ -242,8 +242,9 @@ function setupIpcHandlers() {
   })
 
   // Handler para chat streaming
-  ipcMain.handle('chat:stream', async (event, { sessionId, messages, model, opts }) => {
+  ipcMain.handle('chat:stream', async (event, { sessionId, messages, model, opts, mode }) => {
     try {
+      console.log('Main: Handler chat:stream ejecutándose, modo:', mode);
       if (!openaiClient) {
         throw new Error('OpenAI client no inicializado. Configura OPENAI_API_KEY')
       }

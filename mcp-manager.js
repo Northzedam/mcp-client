@@ -220,6 +220,11 @@ class MCPManager {
         windowsHide: true // Ocultar ventana de consola en Windows
       });
 
+      // Capturar errores de stderr
+      childProcess.stderr.on('data', (data) => {
+        console.error(`MCPManager: Error stderr ${serverId}:`, data.toString());
+      });
+
       // Manejar errores del proceso
       childProcess.on('error', (error) => {
         console.error(`MCPManager: Error en proceso MCP ${serverId}:`, error);
@@ -264,7 +269,7 @@ class MCPManager {
           const messages = data.toString().split('\n').filter(Boolean);
           messages.forEach(message => {
             const response = JSON.parse(message);
-            console.log('MCPManager: Respuesta MCP:', response);
+            console.log('MCPManager: Respuesta MCP:', JSON.stringify(response, null, 2));
             
             if (response.id === 1 && response.result && !initialized) {
               initialized = true;
@@ -404,6 +409,7 @@ class MCPManager {
               if (response.id === requestId && response.result) {
                 clearTimeout(timeout);
                 console.log('MCPManager: Herramienta ejecutada exitosamente:', toolName);
+                console.log('MCPManager: Resultado completo de la herramienta:', JSON.stringify(response.result, null, 2));
                 resolve(response.result);
               } else if (response.id === requestId && response.error) {
                 clearTimeout(timeout);

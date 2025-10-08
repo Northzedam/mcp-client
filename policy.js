@@ -17,6 +17,46 @@ class PolicyEngine {
     this.rules.set('read_file', 'ALLOW')
     this.rules.set('write_file', 'REQUIRE_CONFIRMATION')
     this.rules.set('delete_file', 'REQUIRE_CONFIRMATION')
+    
+    // Reglas para herramientas MCP reales
+    // Herramientas de filesystem MCP
+    this.rules.set('read_file', 'ALLOW')
+    this.rules.set('read_text_file', 'ALLOW')
+    this.rules.set('read_media_file', 'ALLOW')
+    this.rules.set('read_multiple_files', 'ALLOW')
+    this.rules.set('write_file', 'REQUIRE_CONFIRMATION')
+    this.rules.set('edit_file', 'REQUIRE_CONFIRMATION')
+    this.rules.set('create_directory', 'REQUIRE_CONFIRMATION')
+    this.rules.set('list_directory', 'ALLOW')
+    this.rules.set('list_directory_with_sizes', 'ALLOW')
+    this.rules.set('directory_tree', 'ALLOW')
+    this.rules.set('move_file', 'REQUIRE_CONFIRMATION')
+    this.rules.set('search_files', 'ALLOW')
+    this.rules.set('get_file_info', 'ALLOW')
+    this.rules.set('list_allowed_directories', 'ALLOW')
+    
+    // Herramientas de Playwright MCP
+    this.rules.set('browser_close', 'ALLOW')
+    this.rules.set('browser_resize', 'ALLOW')
+    this.rules.set('browser_console_messages', 'ALLOW')
+    this.rules.set('browser_handle_dialog', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_evaluate', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_file_upload', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_fill_form', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_install', 'ALLOW')
+    this.rules.set('browser_press_key', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_type', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_navigate', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_navigate_back', 'ALLOW')
+    this.rules.set('browser_network_requests', 'ALLOW')
+    this.rules.set('browser_take_screenshot', 'ALLOW')
+    this.rules.set('browser_snapshot', 'ALLOW')
+    this.rules.set('browser_click', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_drag', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_hover', 'ALLOW')
+    this.rules.set('browser_select_option', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_tabs', 'ALLOW')
+    this.rules.set('browser_wait_for', 'ALLOW')
   }
 
   evaluate(tool, args = {}) {

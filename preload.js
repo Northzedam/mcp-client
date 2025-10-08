@@ -31,6 +31,10 @@ contextBridge.exposeInMainWorld('api', {
       
       const endListener = (event, data) => {
         if (data.sessionId === payload.sessionId) {
+          // Enviar la respuesta final al callback
+          if (onDelta && data.fullResponse) {
+            onDelta({ content: data.fullResponse, fullResponse: data.fullResponse })
+          }
           ipcRenderer.removeListener('chat:stream:delta', deltaListener)
           ipcRenderer.removeListener('chat:stream:end', endListener)
           ipcRenderer.removeListener('chat:stream:error', errorListener)

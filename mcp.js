@@ -166,6 +166,8 @@ class MCPAdapter {
         // Ejecutar la herramienta usando el MCPManager real
         const result = await mcpManager.executeTool(mcpTool.serverId, mcpTool.name, args, 'chat-session')
         
+        console.log(`MCPAdapter: Resultado de la herramienta ${mcpTool.name}:`, JSON.stringify(result, null, 2));
+        
         return {
           success: true,
           result: result,
