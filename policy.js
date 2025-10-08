@@ -46,7 +46,7 @@ class PolicyEngine {
     this.rules.set('browser_install', 'ALLOW')
     this.rules.set('browser_press_key', 'REQUIRE_CONFIRMATION')
     this.rules.set('browser_type', 'REQUIRE_CONFIRMATION')
-    this.rules.set('browser_navigate', 'REQUIRE_CONFIRMATION')
+    this.rules.set('browser_navigate', 'ALLOW')
     this.rules.set('browser_navigate_back', 'ALLOW')
     this.rules.set('browser_network_requests', 'ALLOW')
     this.rules.set('browser_take_screenshot', 'ALLOW')
